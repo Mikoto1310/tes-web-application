@@ -1,7 +1,7 @@
 {
   "name": "mini-ecommerce-server",
   "version": "1.0.0",
-  "type": "module",
+  "main": "app.js",
   "scripts": {
     "dev": "node app.js",
     "seed": "node db/seed.js"
