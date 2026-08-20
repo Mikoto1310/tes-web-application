@@ -11,10 +11,15 @@ import cartRoutes from './routes/cart.js';
 import orderRoutes from './routes/orders.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const isProd = process.env.VERCEL;
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({
+  origin: isProd ? true : 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -23,19 +28,23 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 
-app.use(express.static(join(__dirname, '..', 'client', 'dist')));
-
-app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, '..', 'client', 'dist', 'index.html'));
-});
+if (!isProd) {
+  app.use(express.static(join(__dirname, '..', 'client', 'dist')));
+  app.get('*', (req, res) => {
+    res.sendFile(join(__dirname, '..', 'client', 'dist', 'index.html'));
+  });
+}
 
 async function start() {
   await getDb();
   console.log('Database initialized');
-
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
-start().catch(console.error);
+if (!isProd) {
+  start().catch(console.error);
+}
+
+export { app };

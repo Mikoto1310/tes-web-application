@@ -22,5 +22,5 @@ Thumbs.db
 *.swp
 *.swo
 
-# Package lock (opsional, tergantung tim)
-package-lock.json
+# Local database
+server/db/store.db

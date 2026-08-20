@@ -4,7 +4,8 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DB_PATH = join(__dirname, 'store.db');
+const isVercel = !!process.env.VERCEL;
+const DB_PATH = isVercel ? '/tmp/store.db' : join(__dirname, 'store.db');
 
 let db = null;
 
@@ -82,6 +83,17 @@ export async function getDb() {
       FOREIGN KEY (product_id) REFERENCES products(id)
     )
   `);
+
+  const count = db.exec('SELECT COUNT(*) as cnt FROM products');
+  const productCount = count[0]?.values[0][0] || 0;
+  if (productCount === 0) {
+    const { products } = await import('./products.js');
+    const insert = db.prepare('INSERT INTO products (name, description, price, image_url, stock, category) VALUES (?, ?, ?, ?, ?, ?)');
+    for (const p of products) {
+      insert.run([p.name, p.description, p.price, p.image_url, p.stock, p.category]);
+    }
+    insert.free();
+  }
 
   saveDb();
   return db;

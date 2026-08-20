@@ -1,0 +1,11 @@
+{
+  "name": "mini-ecommerce",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "cd client && npm run dev",
+    "build": "cd client && npm install && npm run build",
+    "start": "cd server && node index.js",
+    "seed": "cd server && node db/seed.js"
+  }
+}
